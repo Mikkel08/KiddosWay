@@ -1,10 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebastian Klein Dyrehistorie Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
+<div class="container">
+    <header>
+        <h1>🦁 Sebastian Klein Dyrehistorie Generator 🐯</h1>
+        <p class="subtitle">Skab fantastiske dyrehistorier med fakta og sjov!</p>
+    </header>
 
+    <main>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="animalName">Dyrets navn:</label>
+                <input type="text" id="animalName" placeholder="F.eks. Rød panda" required>
+            </div>
+
+            <div class="form-group">
+                <label for="geography">Geografisk placering:</label>
+                <input type="text" id="geography" placeholder="F.eks. Himalaya bjergene i Asien">
+            </div>
+
+            <div class="form-group">
+                <label>Niveau (0 = Børnehave, 10 = 8. klasse):</label>
+                <div class="slider-container">
+                    <input type="range" id="level" class="slider" min="0" max="10" value="5">
+                    <span id="levelValue" class="slider-value">5</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tekstlængde:</label>
+                <div class="slider-container">
+                    <input type="range" id="length" class="slider" min="500" max="3000" step="100" value="1000">
+                    <span id="lengthValue" class="slider-value">1000</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Formidlingsstil (1 = Nøgtern, 10 = Fuld Sebastian Klein):</label>
+                <div class="slider-container">
+                    <input type="range" id="style" class="slider" min="1" max="10" value="7">
+                    <span id="styleValue" class="slider-value">7</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Fokusområder:</label>
+                <div class="category-container">
+                    <div class="category-item">
+                        <label>
+                            <span>Fakta om dyret:</span>
+                            <select id="factsFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Sjove anekdoter:</span>
+                            <select id="funnyFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Levevis:</span>
+                            <select id="habitatFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Fødevaner:</span>
+                            <select id="dietFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Særlige egenskaber:</span>
+                            <select id="specialAbilitiesFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Udseende:</span>
+                            <select id="appearanceFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Overlevelsesstrategier:</span>
+                            <select id="survivalFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="category-item">
+                        <label>
+                            <span>Adfærd:</span>
+                            <select id="behaviorFocus">
+                                <option value="høj fokus">Høj fokus</option>
+                                <option value="lav fokus">Lav fokus</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button id="generateBtn" class="primary-button">Generer Dyrehistorie</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Genererer dyrehistorie... Dette kan tage op til et minut.</p>
+        </div>
+
+        <div id="error" class="error"></div>
+
+        <div id="result" class="result">
+            <!-- Her kommer resultatet -->
+        </div>
+    </main>
+
+    <footer>
+        <p>Lavet med 💚 til dyr og børn</p>
+        <p>Powered by Claude AI og Sebastian Klein-inspireret formidling</p>
+    </footer>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
