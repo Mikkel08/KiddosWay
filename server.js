@@ -19,6 +19,9 @@ if (!ANTHROPIC_API_KEY) {
     console.error('ADVARSEL: ANTHROPIC_API_KEY er ikke defineret i .env filen');
 }
 
+// Debug info
+console.log('API-nøgle indlæst: ', ANTHROPIC_API_KEY ? 'Ja (længde: ' + ANTHROPIC_API_KEY.length + ')' : 'Nej');
+
 // API route til at generere historier
 app.post('/api/generate-story', async (req, res) => {
     try {
@@ -28,7 +31,7 @@ app.post('/api/generate-story', async (req, res) => {
             level,
             textLength,
             style,
-            focusAreas
+            focusAreasData
         } = req.body;
 
         // Valider inputs
@@ -38,149 +41,193 @@ app.post('/api/generate-story', async (req, res) => {
 
         console.log('Genererer historie for:', animalName);
 
-        // Byg prompt
-        const prompt = `# Sebastian Klein Style Animal Stories Generator
+        // Forbered fokusområder i det nye format - sorteret efter værdi
+        const sortedFocusAreas = [...focusAreasData].sort((a, b) => b.value - a.value);
+        const focusAreasText = sortedFocusAreas
+            .map(area => `${area.name} (${area.value}/10)`)
+            .join(', ');
 
-Du skal skrive en faktabaseret dyrehistorie i Sebastian Klein stil på dansk. Følg disse instruktioner nøje for at skabe en passende tekst:
+        // Forbered slider-værdier
+        const sliderValues = focusAreasData.map(area => {
+            // Konverter 0-10 skala til -10 til 10 skala
+            const convertedValue = (area.value - 5) * 2;
+            return `- ${area.name}: ${convertedValue}`;
+        }).join('\n');
 
-## 1. Skriveniveau
-Teksten skal skrives på et ${level} niveau, målt på en skala fra 0 til 10, hvor 0 repræsenterer det laveste LIX-tal egnet til yngre børn (f.eks. børnehaveniveau), og 10 repræsenterer det højeste LIX-tal egnet til ældre børn (f.eks. 8. klasse). Sørg for, at sprogets kompleksitet matcher det angivne niveau.
+        console.log('Fokusområder:', focusAreasText);
+        console.log('Slider-værdier:', sliderValues);
 
-- **Niveau 0-2**: Meget enkle sætninger, stavelsesdelte ord, basalt ordforråd.
-- **Niveau 3-5**: Korte sætninger, letforståeligt sprog, få fagudtryk med forklaring.
-- **Niveau 6-8**: Mere komplekse sætninger, flere fagudtryk, dybere forklaringer.
-- **Niveau 9-10**: Avanceret sprog, videnskabelige termer, nuancerede beskrivelser.
+        // Byg prompt med den nye struktur
+        const prompt = `Du er en erfaren dansk forfatter, der specialiserer sig i at skrive faktabaserede dyrehistorier for børn i Sebastian Klein-stil. Din opgave er at skabe en engagerende og informativ historie om et bestemt dyr, der balancerer underholdning og videnskabelig nøjagtighed.
 
-## 2. Tekstlængde
-Teksten skal være ${textLength} tegn lang, inklusive mellemrum. Forsøg at komme så tæt på denne længde som muligt uden at gå på kompromis med indholdet.
+Her er de vigtige oplysninger om dyret og de ønskede parametre for historien:
 
-## 3. Fokusområder
-Her er fokusområderne og deres vigtighed:
-${focusAreas}
+Dyret, du skal skrive om:
+<dyrenavn>
+${animalName}
+</dyrenavn>
 
-## 4. Dyrefakta-stil
-Teksten skal skrives i Sebastian Klein stil, hvilket betyder:
+Dyrets geografiske område:
+<geografi>
+${geography || 'Ikke specificeret'}
+</geografi>
 
-- **Entusiastisk og engagerende tone**: Brug udråbsord og entusiastiske udtryk.
-- **Fascinerende fakta**: Inkluder interessante, overraskende og måske lidt ulækre detaljer, som børn elsker.
-- **Humoristisk tilgang**: Brug humor og sjove sammenligninger til at forklare dyrets adfærd.
-- **Respektfuld over for dyr**: Vis fascination og respekt for dyrets tilpasningsevner og særlige egenskaber.
-- **Direkte henvendelse**: Tal direkte til læseren, som om du fortæller dem en hemmelighed.
-- **Balanceret blanding**: Kombiner underholdning med læring, så fakta præsenteres på en spændende måde.
+Fokusområder for historien (rangeret efter vigtighed):
+<fokusområder>
+${focusAreasText}
+</fokusområder>
 
-## 5. Dyrespecifikke oplysninger
-Inkluder følgende oplysninger om dyret:
+Skriveniveau (0-10, hvor 0 er egnet til børnehavebørn, og 10 er egnet til 8. klasse):
+<niveau>
+${level}
+</niveau>
 
-- **Dyrets navn**: ${animalName} (både det almindelige navn og det latinske navn hvis passende for niveauet)
-- **Habitat/levested**: Beskriv hvor dyret lever og hvordan det har tilpasset sig dette miljø.
-- **Fødevaner**: Forklar hvad dyret spiser og hvordan det jager eller finder føde.
-- **Særlige egenskaber**: Fremhæv unikke eller fascinerende egenskaber ved dyret.
-- **Adfærd**: Beskriv interessant adfærd, f.eks. parring, yngelpleje, flokdynamik.
-- **Størrelse og udseende**: Giv en levende beskrivelse af dyrets udseende og størrelse.
-- **Overlevelsesstrategier**: Forklar hvordan dyret forsvarer sig mod fjender eller tilpasser sig miljøet.
-- **Sjove anekdoter**: Inkluder overraskende fakta eller kuriøse detaljer.
+Ønsket tekstlængde (antal tegn, inklusive mellemrum):
+<længde>
+${textLength}
+</længde>
 
-## 6. Yderligere personalisering
-Inkluder disse variabler for at gøre historien mere unik:
+Formidlingsstil (0-10, hvor 0 er meget nøgtern og videnskabelig, og 10 er fuld Sebastian Klein-stil med høj entusiasme):
+<formidlingsstil>
+${style}
+</formidlingsstil>
 
-- **Geografisk placering**: ${geography} (hvor i verden dyret lever)
+Fokusområder med sliderværdier (fra -10 til 10):
+<fokus_sliders>
+${sliderValues}
+</fokus_sliders>
 
-## 7. Formidlingsstil
-Formidlingsstilen skal tilpasses en skala fra ${style} hvor:
+Før du begynder at skrive historien, skal du planlægge og forberede indholdet grundigt. Udfør følgende trin inden for <dyrehistorie_planlægning> tags:
 
-**1-3: Nøgtern og faktabaseret**
-- Primært informativ med få udråb
-- Hovedsageligt saglige beskrivelser
-- Begrænset brug af humor
-- Direkte faktaformidling
-- Rolig og behersket tone
+1. Research og list nøglefakta om dyret, inklusiv habitat, fødevaner, særlige egenskaber, adfærd, størrelse, udseende og overlevelsesstrategier.
+2. Analyser sliderværdierne og beskriv, hvordan de vil påvirke indholdet og fokus i historien.
+3. Liste de vigtigste punkter for hvert fokusområde, og juster vægtningen baseret på sliderværdierne og fokusområdernes rangering.
+4. Brainstorm engagerende måder at præsentere hvert fokusområde på, inklusiv interessante sammenligninger og anekdoter.
+5. Lav en detaljeret disposition for historiens struktur, inklusiv ideer til en fængende åbning og en mindeværdig afslutning.
+6. Planlæg, hvordan du vil tilpasse sprog og stil til det angivne niveau og formidlingsstil. Giv eksempler på ordvalg og sætningsstruktur, der passer til niveauet.
+7. Overvej, hvordan du vil inkorporere alle de nødvendige elementer og balancere videnskabelig nøjagtighed med engagement.
+8. Udtænk kreative sammenligninger og anekdoter til at gøre historien mere levende. List mindst tre ideer.
+9. Overvej, hvordan du kan moderere brugen af udråb og overentusiastisk sprog, især ved lavere niveauer af formidlingsstil-skalaen. Giv eksempler på, hvordan du vil justere tonen.
+10. Brainstorm ideer til, hvordan du kan involvere læseren direkte i historien.
 
-**4-6: Moderat engageret**
-- Balanceret mellem fakta og underholdning
-- Enkelte udråb og entusiastiske vendinger
-- Nogle sjove sammenligninger
-- Lettere uformelt sprog
-- Involverer læseren med spørgsmål
+Efter din grundige planlægning, præsenter din dyrehistorie i følgende format:
 
-**7-8: Livlig og engagerende**
-- Energisk sprog med flere udråb
-- Flere humoristiske indslag
-- Overraskende fakta fremhæves
-- Aktive verber og levende beskrivelser
-- Direkte henvendelser til læseren
+<forklaring>
+[Kort forklaring af, hvordan fokusområder og niveau er adresseret]
+</forklaring>
 
-**9-10: Fuld Sebastian Klein og Dolph stil**
-- Start med en fængende åbning: "Ved du hvad der er SEJERE end en skateboard-konkurrence? En ${animalName}!"
-- Brug STORE bogstaver og mange udråbstegn!!!
-- Aktive verber og overdrevne beskrivelser: "Den SLUGER byttet i ét GIGANTISK gab!"
-- Sjove og overdrevne sammenligninger: "Dens lugtesans er SÅ god, at den kunne finde en hamburger, der er begravet under 100 sofapuder!"
-- Slang og børnevenlige udtryk: "Mega-sejt!", "Vildt klamt!", "Helt ærligt - det er da FANTASTISK?"
-- Overdrevet entusiasme og fascinerede udråb: "WOW!", "TÆNK lige på det!", "Det er JO VILDT!"
-- Afslutning med en overraskende pointe eller spørgsmål: "Og ved du hvad der er det VILDESTE ved ${animalName}? Den kan..."
+<dyrehistorie>
+[Din dyrehistorie her]
+</dyrehistorie>
 
-## 8. Præsentation
-Skriv din dyrehistorie inden for <dyrehistorie> tags. Før teksten skal du give en kort forklaring af, hvordan du har adresseret de givne fokusområder og overholdt det specificerede niveau, indkapslet i <forklaring> tags.
+Husk at:
+- Tilpasse indholdet til det angivne skriveniveau og formidlingsstil.
+- Inkludere information om habitat/levested, fødevaner, særlige egenskaber, adfærd, størrelse og udseende, overlevelsesstrategier, samt sjove anekdoter eller overraskende fakta.
+- Vise fascination og respekt for dyret.
+- Balancere underholdning med læring.
+- Bruge aktive verber og levende beskrivelser.
+- Involvere læseren direkte.
+- Inkludere interessante sammenligninger.
 
-Husk at skrive hele teksten på dansk, da det er målsproget for denne opgave.`;
+Skriv hele teksten på dansk og inkluder kun forklaringen og dyrehistorien i dit endelige output.`;
 
-        // Kald Anthropic API
-        const response = await axios.post(
-            'https://api.anthropic.com/v1/messages',
-            {
-                model: 'claude-3-7-sonnet-20250219',
-                max_tokens: 20000,
-                temperature: 1,
+        // Kald Anthropic API med forbedret fejlhåndtering
+        try {
+            console.log('Sender anmodning til Anthropic API');
+
+            // Forbered request-objektet - fjernet beta parameter
+            const requestBody = {
+                model: 'claude-3-5-haiku-20241022',
+                max_tokens: 8192,
+                temperature: 0.7,
                 messages: [
                     {
                         role: 'user',
                         content: prompt
-                    }
+                    },
+                   /* {
+                        role: 'assistant',
+                        content: [
+                            {
+                                type: 'text',
+                                text: '<dyrehistorie_planlægning>'
+                            }
+                        ]
+                    }*/
                 ]
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'anthropic-version': '2023-06-01',
-                    'x-api-key': ANTHROPIC_API_KEY
+            };
+
+            console.log('Request body forberedt uden beta parameter');
+
+            const response = await axios.post(
+                'https://api.anthropic.com/v1/messages',
+                requestBody,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'anthropic-version': '2023-06-01',
+                        'x-api-key': ANTHROPIC_API_KEY
+                    }
                 }
+            );
+
+            console.log('Modtog svar fra Anthropic API');
+
+            // Udtræk indhold
+            let forklaring = '';
+            let dyrehistorie = '';
+            const fullContent = response.data.content[0].text;
+
+            // Udtræk forklaring
+            const forklaringMatch = fullContent.match(/<forklaring>([\s\S]*?)<\/forklaring>/);
+            if (forklaringMatch && forklaringMatch[1]) {
+                forklaring = forklaringMatch[1].trim();
             }
-        );
 
-        console.log('Modtog svar fra Anthropic API');
+            // Udtræk historie
+            const dyrehistorieMatch = fullContent.match(/<dyrehistorie>([\s\S]*?)<\/dyrehistorie>/);
+            if (dyrehistorieMatch && dyrehistorieMatch[1]) {
+                dyrehistorie = dyrehistorieMatch[1].trim();
+            } else {
+                dyrehistorie = fullContent;
+            }
 
-        // Udtræk indhold
-        let forklaring = '';
-        let dyrehistorie = '';
-        const fullContent = response.data.content[0].text;
+            res.json({
+                forklaring,
+                dyrehistorie
+            });
 
-        // Udtræk forklaring
-        const forklaringMatch = fullContent.match(/<forklaring>([\s\S]*?)<\/forklaring>/);
-        if (forklaringMatch && forklaringMatch[1]) {
-            forklaring = forklaringMatch[1].trim();
+        } catch (error) {
+            console.error('Fejl ved API kald til Anthropic:', error);
+
+            // Forbedret fejlhåndtering med fejldetaljer
+            const errorDetails = error.response?.data ?
+                JSON.stringify(error.response.data, null, 2) :
+                error.message;
+
+            console.error('Fejldetaljer:', errorDetails);
+
+            // Bygger en mere brugervenlig fejlbesked
+            let userMessage = 'Kunne ikke generere historie';
+
+            if (error.response?.status === 401) {
+                userMessage = 'API-nøgle afvist. Kontroller at API-nøglen er gyldig.';
+            } else if (error.response?.status === 400) {
+                userMessage = 'Ugyldig anmodning. Der kan være et problem med inputværdierne.';
+            } else if (error.response?.status === 429) {
+                userMessage = 'For mange anmodninger. Prøv igen senere.';
+            } else if (error.response?.status >= 500) {
+                userMessage = 'Serverfejl hos Anthropic. Prøv igen senere.';
+            }
+
+            res.status(500).json({
+                error: userMessage,
+                details: errorDetails
+            });
         }
-
-        // Udtræk historie
-        const dyrehistorieMatch = fullContent.match(/<dyrehistorie>([\s\S]*?)<\/dyrehistorie>/);
-        if (dyrehistorieMatch && dyrehistorieMatch[1]) {
-            dyrehistorie = dyrehistorieMatch[1].trim();
-        } else {
-            dyrehistorie = fullContent;
-        }
-
-        res.json({
-            forklaring,
-            dyrehistorie
-        });
-
     } catch (error) {
-        console.error('Fejl ved generering af historie:', error);
-
-        // Send en mere detaljeret fejlmeddelelse 
-        const errorMessage = error.response?.data?.error?.message || error.message || 'Ukendt fejl';
-        res.status(500).json({
-            error: 'Kunne ikke generere historie',
-            details: errorMessage
-        });
+        console.error('Generel fejl:', error);
+        res.status(500).json({ error: 'Der opstod en uventet fejl', details: error.message });
     }
 });
 

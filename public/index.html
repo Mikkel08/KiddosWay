@@ -37,8 +37,8 @@
             <div class="form-group">
                 <label>Tekstlængde:</label>
                 <div class="slider-container">
-                    <input type="range" id="length" class="slider" min="500" max="3000" step="100" value="1000">
-                    <span id="lengthValue" class="slider-value">1000</span>
+                    <input type="range" id="length" class="slider" min="1000" max="8000" step="500" value="3000">
+                    <span id="lengthValue" class="slider-value">3000</span>
                 </div>
             </div>
 
@@ -51,78 +51,78 @@
             </div>
 
             <div class="form-group">
-                <label>Fokusområder:</label>
-                <div class="category-container">
-                    <div class="category-item">
+                <label>Fokusområder (træk sliders til højre for mere fokus):</label>
+                <div class="focus-sliders">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Fakta om dyret:</span>
-                            <select id="factsFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="factsFocus" class="slider" min="0" max="10" value="8">
+                                <span id="factsValue" class="slider-value">8</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Sjove anekdoter:</span>
-                            <select id="funnyFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="funnyFocus" class="slider" min="0" max="10" value="7">
+                                <span id="funnyValue" class="slider-value">7</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Levevis:</span>
-                            <select id="habitatFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="habitatFocus" class="slider" min="0" max="10" value="6">
+                                <span id="habitatValue" class="slider-value">6</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Fødevaner:</span>
-                            <select id="dietFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="dietFocus" class="slider" min="0" max="10" value="6">
+                                <span id="dietValue" class="slider-value">6</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Særlige egenskaber:</span>
-                            <select id="specialAbilitiesFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="specialAbilitiesFocus" class="slider" min="0" max="10" value="8">
+                                <span id="specialAbilitiesValue" class="slider-value">8</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Udseende:</span>
-                            <select id="appearanceFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="appearanceFocus" class="slider" min="0" max="10" value="7">
+                                <span id="appearanceValue" class="slider-value">7</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Overlevelsesstrategier:</span>
-                            <select id="survivalFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="survivalFocus" class="slider" min="0" max="10" value="5">
+                                <span id="survivalValue" class="slider-value">5</span>
+                            </div>
                         </label>
                     </div>
-                    <div class="category-item">
+                    <div class="focus-slider-item">
                         <label>
                             <span>Adfærd:</span>
-                            <select id="behaviorFocus">
-                                <option value="høj fokus">Høj fokus</option>
-                                <option value="lav fokus">Lav fokus</option>
-                            </select>
+                            <div class="slider-container">
+                                <input type="range" id="behaviorFocus" class="slider" min="0" max="10" value="7">
+                                <span id="behaviorValue" class="slider-value">7</span>
+                            </div>
                         </label>
                     </div>
                 </div>
@@ -133,7 +133,7 @@
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>Genererer dyrehistorie... Dette kan tage op til et minut.</p>
+            <p>Genererer dyrehistorie... Dette kan tage op til et par minutter, da historien skabes med stort omhu.</p>
         </div>
 
         <div id="error" class="error"></div>

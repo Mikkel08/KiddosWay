@@ -13,7 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorElement = document.getElementById('error');
     const resultElement = document.getElementById('result');
 
-    // Update slider values
+    // Fokusområde sliders
+    const focusSliders = [
+        { slider: document.getElementById('factsFocus'), value: document.getElementById('factsValue'), name: 'Fakta om dyret' },
+        { slider: document.getElementById('funnyFocus'), value: document.getElementById('funnyValue'), name: 'Sjove anekdoter' },
+        { slider: document.getElementById('habitatFocus'), value: document.getElementById('habitatValue'), name: 'Levevis' },
+        { slider: document.getElementById('dietFocus'), value: document.getElementById('dietValue'), name: 'Fødevaner' },
+        { slider: document.getElementById('specialAbilitiesFocus'), value: document.getElementById('specialAbilitiesValue'), name: 'Særlige egenskaber' },
+        { slider: document.getElementById('appearanceFocus'), value: document.getElementById('appearanceValue'), name: 'Udseende' },
+        { slider: document.getElementById('survivalFocus'), value: document.getElementById('survivalValue'), name: 'Overlevelsesstrategier' },
+        { slider: document.getElementById('behaviorFocus'), value: document.getElementById('behaviorValue'), name: 'Adfærd' }
+    ];
+
+    // Update generelle slider værdier
     levelSlider.addEventListener('input', function() {
         levelValue.textContent = this.value;
     });
@@ -25,6 +37,35 @@ document.addEventListener('DOMContentLoaded', function() {
     styleSlider.addEventListener('input', function() {
         styleValue.textContent = this.value;
     });
+
+    // Opdater fokusslider værdier og stilarter
+    focusSliders.forEach(item => {
+        item.slider.addEventListener('input', function() {
+            item.value.textContent = this.value;
+            updateSliderStyle(this);
+        });
+
+        // Initialiser sliderstil
+        updateSliderStyle(item.slider);
+    });
+
+    // Funktion til at opdatere sliderstil baseret på værdi
+    function updateSliderStyle(slider) {
+        const value = slider.value;
+        const percentage = ((value - slider.min) / (slider.max - slider.min)) * 100;
+
+        // Farvegradient baseret på værdi
+        let color;
+        if (value < 4) {
+            color = '#f44336'; // Rød for lav fokus
+        } else if (value < 7) {
+            color = '#FFC107'; // Gul for medium fokus
+        } else {
+            color = '#4CAF50'; // Grøn for høj fokus
+        }
+
+        slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${percentage}%, #ddd ${percentage}%, #ddd 100%)`;
+    }
 
     // Generate story function
     generateBtn.addEventListener('click', async function() {
@@ -42,17 +83,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
         resultElement.style.display = 'none';
 
-        // Collect focus areas
-        const focusAreas = [
-            `Fakta om dyret: ${document.getElementById('factsFocus').value}`,
-            `Sjove anekdoter: ${document.getElementById('funnyFocus').value}`,
-            `Levevis: ${document.getElementById('habitatFocus').value}`,
-            `Fødevaner: ${document.getElementById('dietFocus').value}`,
-            `Særlige egenskaber: ${document.getElementById('specialAbilitiesFocus').value}`,
-            `Udseende: ${document.getElementById('appearanceFocus').value}`,
-            `Overlevelsesstrategier: ${document.getElementById('survivalFocus').value}`,
-            `Adfærd: ${document.getElementById('behaviorFocus').value}`
-        ].join(', ');
+        // Samle fokusområdedata fra sliders
+        const focusAreasData = focusSliders.map(item => ({
+            name: item.name,
+            value: item.slider.value
+        }));
 
         // Prepare request payload
         const requestData = {
@@ -61,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             level: levelSlider.value,
             textLength: lengthSlider.value,
             style: styleSlider.value,
-            focusAreas
+            focusAreasData
         };
 
         // Send to server API
@@ -94,6 +129,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function showLoading() {
         loadingIndicator.style.display = 'block';
         generateBtn.disabled = true;
+
+        // Opdater tekst til at indikere længere procestid
+        document.querySelector('#loading p').textContent =
+            'Genererer dyrehistorie... Dette kan tage op til et par minutter, da historien skabes med stort omhu.';
     }
 
     function hideLoading() {
@@ -152,6 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         resultElement.appendChild(storySection);
 
+        // Add buttons container
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'button-container';
+
         // Add download button
         const downloadButton = document.createElement('button');
         downloadButton.className = 'download-button';
@@ -160,7 +203,37 @@ document.addEventListener('DOMContentLoaded', function() {
             downloadText(`${animalName} - Dyrehistorie.txt`, data.dyrehistorie);
         };
 
-        resultElement.appendChild(downloadButton);
+        // Add copy button
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-button';
+        copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Kopiér til udklipsholder';
+        copyButton.onclick = function() {
+            navigator.clipboard.writeText(data.dyrehistorie).then(() => {
+                // Midlertidigt skift tekst for at vise, at kopiering lykkedes
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '✓ Kopieret!';
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                }, 2000);
+            });
+        };
+
+        // Add generate new button
+        const newButton = document.createElement('button');
+        newButton.className = 'new-button';
+        newButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 12a9 9 0 0 0 6.7 15L13 21"></path><path d="M14 21h6v-6"></path></svg> Generer ny historie';
+        newButton.onclick = function() {
+            // Scroll tilbage til toppen af formularen
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Add buttons to container
+        buttonsContainer.appendChild(downloadButton);
+        buttonsContainer.appendChild(copyButton);
+        buttonsContainer.appendChild(newButton);
+
+        // Add buttons container to result
+        resultElement.appendChild(buttonsContainer);
 
         // Show result
         resultElement.style.display = 'block';

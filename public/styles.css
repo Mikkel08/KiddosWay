@@ -147,26 +147,42 @@ input:focus, select:focus, textarea:focus {
     box-shadow: none;
 }
 
-.category-container {
+/* Fokus-sliders styling */
+.focus-sliders {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-.category-item {
-    margin-bottom: 10px;
+.focus-slider-item {
+    margin-bottom: 15px;
 }
 
-.category-item label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.focus-slider-item label {
+    display: block;
     margin-bottom: 5px;
 }
 
-.category-item select {
-    width: 120px;
-    padding: 8px;
+.focus-slider-item .slider-container {
+    display: flex;
+    align-items: center;
+}
+
+.focus-slider-item .slider {
+    flex-grow: 1;
+}
+
+/* Tilføj farveovergange til fokus-sliders baseret på værdi */
+.slider.low-focus {
+    background: linear-gradient(to right, #ddd, #ddd);
+}
+
+.slider.medium-focus {
+    background: linear-gradient(to right, #FFC107, #FFC107);
+}
+
+.slider.high-focus {
+    background: linear-gradient(to right, #4CAF50, #4CAF50);
 }
 
 .loading {
@@ -214,6 +230,7 @@ input:focus, select:focus, textarea:focus {
 .result p {
     margin-bottom: 15px;
     line-height: 1.8;
+    font-size: 16px;
 }
 
 .result hr {
@@ -222,7 +239,14 @@ input:focus, select:focus, textarea:focus {
     border-top: 1px solid #eee;
 }
 
-.download-button {
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.download-button, .copy-button, .new-button {
     background-color: var(--secondary-color);
     color: var(--text-color);
     border: none;
@@ -230,23 +254,38 @@ input:focus, select:focus, textarea:focus {
     font-size: 14px;
     cursor: pointer;
     border-radius: var(--border-radius);
-    margin-top: 20px;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.download-button:hover {
+.download-button:hover, .copy-button:hover {
     background-color: #e6ac00;
+    transform: translateY(-2px);
+}
+
+.new-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.new-button:hover {
+    background-color: var(--dark-color);
+    transform: translateY(-2px);
 }
 
 .explanation {
     background-color: #f9f9f9;
-    padding: 15px;
+    padding: 20px;
     border-radius: var(--border-radius);
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     font-style: italic;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.story {
+    margin-bottom: 30px;
 }
 
 footer {
@@ -265,8 +304,18 @@ footer p {
     to { transform: rotate(360deg); }
 }
 
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
 @media (max-width: 768px) {
-    .category-container {
+    .focus-sliders, .button-container {
         grid-template-columns: 1fr;
     }
 
@@ -276,5 +325,51 @@ footer p {
 
     .form-container, .result {
         padding: 20px;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+}
+
+/* Tilføj styling for output-sektionen */
+.story h3 {
+    color: var(--dark-color);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.story ul, .story ol {
+    margin: 15px 0 15px 20px;
+}
+
+.story li {
+    margin-bottom: 8px;
+}
+
+.story strong, .story b {
+    color: var(--dark-color);
+}
+
+.story em, .story i {
+    color: #555;
+}
+
+/* Responsiv typografi */
+@media (max-width: 600px) {
+    .result p {
+        font-size: 15px;
+    }
+
+    .result h2 {
+        font-size: 22px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 16px;
     }
 }
