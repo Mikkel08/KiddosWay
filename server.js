@@ -12,8 +12,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Øverst i din server.js fil
-require('dotenv').config();
 
 // Når du skal bruge API-nøglen
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
