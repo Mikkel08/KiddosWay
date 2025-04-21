@@ -12,11 +12,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Sikr at API-nøglen findes
+// Øverst i din server.js fil
+require('dotenv').config();
+
+// Når du skal bruge API-nøglen
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 if (!ANTHROPIC_API_KEY) {
-    console.error('ADVARSEL: ANTHROPIC_API_KEY er ikke defineret i .env filen');
+    console.error('ADVARSEL: ANTHROPIC_API_KEY er ikke defineret i miljøvariablerne');
 }
 
 // Debug info
